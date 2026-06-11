@@ -340,7 +340,7 @@
           <canvas id="tetris-next" width="72" height="56" class="bg-[#8BAC0F] rounded border border-[#5C6B2C]"></canvas>
         </div>
       </div>
-      <div class="text-center text-[10px] text-[#8B7E6A] font-mono mb-3 select-none">← → ↓ rotate↑ space↘</div>
+      <div id="game-controls-hint" class="text-center text-[10px] text-[#8B7E6A] font-mono mb-3 select-none">← → ↓ rotate↑ space↘</div>
       <div class="flex gap-2">
         <button onclick="startGame()" class="flex-1 py-2.5 bg-[#5C4F3E] hover:bg-[#3D3224] text-[#D4C9A8] rounded-lg text-sm font-bold tracking-wider transition">
           START
@@ -685,6 +685,11 @@
         document.body.style.overflow = '';
         if (dropTimer) { clearInterval(dropTimer); dropTimer = null; }
       };
+
+      var hint = document.getElementById('game-controls-hint');
+      if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+        hint.textContent = '← → swipe · ↓ swipe · tap rotate · space hard drop';
+      }
 
       document.addEventListener('keydown', function(e) {
         var overlay = document.getElementById('tetris-overlay');
