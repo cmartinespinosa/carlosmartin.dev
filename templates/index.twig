@@ -291,7 +291,12 @@
       <button onclick="closeTetris()" class="absolute top-2 right-3 text-[#8B7E6A] hover:text-[#5C4F3E] text-lg transition z-10">
         <i class="fa-solid fa-xmark"></i>
       </button>
-      <div class="text-center font-bold text-sm tracking-[.3em] text-[#5C4F3E] mb-3 select-none">TETRIS</div>
+      <div class="text-center font-bold text-sm tracking-[.3em] text-[#5C4F3E] mb-3 select-none relative">
+        TETRIS
+        <button id="music-btn" onclick="toggleMusic()" class="absolute right-0 top-1/2 -translate-y-1/2 text-xs text-[#8B7E6A] hover:text-[#5C4F3E] transition" title="Toggle music">
+          <i class="fa-solid fa-volume-xmark"></i>
+        </button>
+      </div>
       <div class="bg-[#8BAC0F] rounded-md p-2 border-2 border-[#5C6B2C] mb-4">
         <canvas id="tetris-game" class="mx-auto" tabindex="0"></canvas>
       </div>
@@ -658,6 +663,70 @@
           case ' ': e.preventDefault(); hardDrop(); break;
         }
       });
+
+      // === TETRIS MUSIC (Korobeiniki) ===
+      (function() {
+        var audioCtx = null, isMuted = true, isPlaying = false, timer = null, idx = 0;
+        var N = {
+          'A3':220,'B3':246.94,'C4':261.63,'C#4':277.18,'D4':293.66,
+          'D#4':311.13,'E4':329.63,'F4':349.23,'F#4':369.99,'G4':392,
+          'G#4':415.30,'A4':440,'A#4':466.16,'B4':493.88,'C5':523.25,
+          'C#5':554.37,'D5':587.33,'D#5':622.25,'E5':659.25
+        };
+        var song = [
+          ['E5',4],['E5',4],['B4',4],['C#5',4],['C#5',4],['A4',6],['A4',2],
+          ['B4',4],['B4',4],['C#5',4],['C#5',4],['D5',4],['E5',8],
+          ['C#5',4],['C#5',4],['B4',4],['B4',4],['A4',4],['B4',2],['C#5',2],
+          ['E5',4],['E5',4],['B4',4],['C#5',4],['C#5',4],['A4',6],['A4',2],
+          ['B4',4],['B4',4],['C#5',4],['C#5',4],['D5',4],['E5',8],
+          ['C#5',4],['C#5',4],['B4',4],['B4',4],['A4',4],['A4',2],['A4',2],
+          ['B4',2],['C#5',2],['E5',4],['E5',4],
+          ['A4',2],['B4',2],['C#5',4],['E5',4],
+          ['A4',2],['B4',2],['C#5',2],['D5',2],['E5',4],['C#5',4],
+          ['B4',4],['A4',4],['B4',2],['A4',2],['R',8]
+        ];
+        var bpm = 140;
+        var beat = 60000 / bpm / 4;
+
+        function play() {
+          if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          if (idx >= song.length) idx = 0;
+          var note = song[idx];
+          var dur = note[1] * beat;
+          if (!isMuted && note[0] !== 'R') {
+            var osc = audioCtx.createOscillator();
+            var gain = audioCtx.createGain();
+            osc.type = 'square';
+            osc.frequency.value = N[note[0]] || 440;
+            gain.gain.setValueAtTime(0.07, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur / 1000);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + dur / 1000 + 0.05);
+          }
+          idx++;
+          timer = setTimeout(play, dur);
+        }
+
+        window.toggleMusic = function() {
+          if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          isMuted = !isMuted;
+          var btn = document.getElementById('music-btn');
+          if (btn) btn.innerHTML = isMuted ? '<i class="fa-solid fa-volume-xmark"></i>' : '<i class="fa-solid fa-volume-high"></i>';
+          if (!isMuted && !isPlaying) { isPlaying = true; idx = 0; play(); }
+          else if (isMuted && isPlaying) { isPlaying = false; if (timer) { clearTimeout(timer); timer = null; } }
+        };
+
+        var origClose = window.closeTetris;
+        window.closeTetris = function() {
+          if (origClose) origClose();
+          isMuted = true; isPlaying = false;
+          if (timer) { clearTimeout(timer); timer = null; }
+          var btn = document.getElementById('music-btn');
+          if (btn) btn.innerHTML = '<i class="fa-solid fa-volume-xmark"></i>';
+        };
+      })();
 
       draw();
     })();
