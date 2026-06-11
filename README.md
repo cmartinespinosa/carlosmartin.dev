@@ -2,6 +2,24 @@
 
 Personal portfolio website built with **Craft CMS 5**, **Tailwind CSS** (CDN), **Alpine.js** (CDN), and **Font Awesome**.
 
+## Table of Contents
+
+- [Project Structure](#project-structure)
+- [CMS Structure](#cms-structure)
+  - [Sections](#sections)
+  - [Template Queries](#template-queries)
+  - [Module](#module)
+  - [Console Commands](#console-commands)
+  - [Key Notes](#key-notes)
+- [Frontend](#frontend)
+  - [Tetris Background](#tetris-background)
+  - [Tetris Game Overlay](#tetris-game-overlay)
+- [Deployment](#deployment)
+  - [Manual Server Setup](#manual-server-setup)
+  - [Deployer](#production-deploys-with-deployer)
+- [Environment Files](#environment-files)
+- [License](#license)
+
 ## Project Structure
 
 ```
@@ -106,58 +124,184 @@ All JavaScript (Tetris game, background animation, smooth scrolling) is inline i
 
 ## Deployment
 
-### Prerequisites
+### Manual Server Setup
 
-- PHP 8.2+ on the server
-- MySQL 8.0+
-- Composer installed on the server
-- SSH access configured
+Complete walkthrough from a bare Ubuntu 26.04 VPS to a running Craft CMS site.
 
-### First-time Server Setup
+#### 1. System Dependencies
 
 ```bash
-# SSH into the server and clone the repo
-ssh user@your-server.com
-git clone git@github.com:cmartinespinosa/carlosmartin.dev.git /var/www/your-domain
-
-# Configure environment
-cd /var/www/your-domain
-cp .env.example.production .env
-# Edit .env with your database credentials, security key, etc.
-
-# Install dependencies
-composer install --no-dev --optimize-autoloader
-
-# Set permissions
-chmod -R 775 storage web/cpresources
-chmod 755 craft
-
-# Run Craft setup
-php craft setup/app-id
-php craft setup/security-key
-
-# Run migrations
-php craft migrate/up
-
-# Run the portfolio installer
-php craft portfoliomodule/install
-
-# Point your web server root to /var/www/your-domain/web
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y nginx mysql-server composer git unzip curl certbot python3-certbot-nginx acl
 ```
+
+#### 2. PHP 8.5 + Extensions
+
+Ubuntu 26.04 ships with PHP 8.5 natively:
+
+```bash
+sudo apt install -y php8.5-fpm php8.5-cli php8.5-mysql php8.5-gd php8.5-intl \
+    php8.5-zip php8.5-mbstring php8.5-bcmath php8.5-curl php8.5-xml php8.5-soap php8.5-bz2
+```
+
+#### 3. MySQL Database
+
+```bash
+sudo mysql -e "CREATE DATABASE my_database CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+PASS=$(openssl rand -base64 24)
+sudo mysql -e "CREATE USER 'craft'@'localhost' IDENTIFIED BY '${PASS}';"
+sudo mysql -e "GRANT ALL PRIVILEGES ON my_database.* TO 'craft'@'localhost'; FLUSH PRIVILEGES;"
+echo "DB_PASSWORD=${PASS}"
+```
+
+#### 4. Clone & Configure
+
+```bash
+sudo mkdir -p /var/www && sudo chown ubuntu:ubuntu /var/www
+git clone git@github.com:cmartinespinosa/carlosmartin.dev.git /var/www/carlosmartin.dev
+cd /var/www/carlosmartin.dev
+cp .env.example.production .env
+```
+
+Edit `.env`:
+
+```
+CRAFT_APP_ID=MyApp
+CRAFT_ENVIRONMENT=production
+CRAFT_DB_DATABASE=my_database
+CRAFT_DB_USER=craft
+CRAFT_DB_PASSWORD=<generated-password>
+CRAFT_SECURITY_KEY=
+CRAFT_DEV_MODE=false
+CRAFT_ALLOW_ADMIN_CHANGES=false
+CRAFT_DISALLOW_ROBOTS=false
+```
+
+#### 5. Install Dependencies
+
+```bash
+composer install --no-dev --optimize-autoloader
+mkdir -p storage/runtime storage/logs storage/backups
+chmod -R 777 storage
+php craft setup/security-key
+```
+
+#### 6. Install Craft CMS
+
+```bash
+# Remove project config if exists (fresh install)
+rm -f config/project/project.yaml
+
+php craft install/craft --interactive=0 \
+    --email="admin@example.com" \
+    --username="admin" \
+    --password="YourPassword123!" \
+    --site-name="Carlos Martin" \
+    --site-url="https://carlosmartin.dev" \
+    --language="en-US"
+
+# Apply the portfolio module (creates sections, fields, seeds content)
+php craft portfoliomodule/install
+```
+
+#### 7. Nginx Config
+
+Create `/etc/nginx/sites-available/carlosmartin.dev`:
+
+```nginx
+server {
+    listen 80;
+    listen [::]:80;
+    server_name carlosmartin.dev www.carlosmartin.dev;
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    server_name carlosmartin.dev www.carlosmartin.dev;
+
+    ssl_certificate /etc/letsencrypt/live/carlosmartin.dev/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/carlosmartin.dev/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    root /var/www/carlosmartin.dev/web;
+    index index.php;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        try_files $uri =404;
+        include fastcgi_params;
+        fastcgi_pass unix:/var/run/php/php8.5-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param HTTP_HOST $host;
+    }
+
+    location = /robots.txt {
+        allow all;
+        log_not_found off;
+        access_log off;
+    }
+
+    location ~ /\. { deny all; }
+
+    location ~* \.(jpg|jpeg|gif|png|ico|css|js|svg|webp|woff|woff2|ttf|eot|mp3|wav)$ {
+        expires max;
+        log_not_found off;
+    }
+}
+```
+
+Enable and test:
+
+```bash
+sudo ln -sf /etc/nginx/sites-available/carlosmartin.dev /etc/nginx/sites-enabled/
+sudo rm -f /etc/nginx/sites-enabled/default
+sudo nginx -t && sudo systemctl restart nginx
+```
+
+#### 8. SSL (Let's Encrypt)
+
+```bash
+sudo certbot --nginx -d carlosmartin.dev -d www.carlosmartin.dev \
+    --non-interactive --agree-tos -m admin@example.com
+```
+
+#### 9. Permissions
+
+```bash
+sudo chown -R www-data:www-data storage web/uploads
+sudo chmod -R 755 storage web/uploads
+```
+
+#### 10. Verify
+
+- Visit `https://carlosmartin.dev`
+- Craft CP: `https://carlosmartin.dev/admin`
 
 ### Production Deploys with Deployer
 
-1. **Configure `deploy.php`** with your server details:
+#### Prerequisites
+
+- SSH key on the server (added as deploy key to GitHub repo)
+- Deploy user on the server with sudo access
+- Composer + PHP on the server
+
+#### Configure `deploy.php`
 
 ```php
 host('production')
     ->setHostname('your-server.com')
-    ->setRemoteUser('your-user')
-    ->setDeployPath('/var/www/your-domain')
+    ->setRemoteUser('deploy')
+    ->setDeployPath('/var/www/carlosmartin.dev')
     ->setIdentityFile('~/.ssh/id_ed25519');
 ```
 
-2. **Deploy from your local machine:**
+#### Deploy
 
 ```bash
 vendor/bin/dep deploy production
@@ -176,7 +320,7 @@ craft:clear-caches/all        # Clear all caches
 deploy:publish                # Symlink release as current
 ```
 
-Keeps the last 3 releases on the server. Rollback with:
+Keeps the last 3 releases. Rollback with:
 
 ```bash
 vendor/bin/dep rollback production
