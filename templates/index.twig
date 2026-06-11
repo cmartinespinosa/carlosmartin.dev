@@ -291,14 +291,91 @@
       <button onclick="closeTetris()" class="absolute -top-8 right-0 text-white/50 hover:text-white text-sm transition z-10">
         <i class="fa-solid fa-xmark"></i> Close
       </button>
-      <div class="rounded-2xl overflow-hidden shadow-2xl" style="background: linear-gradient(180deg, #D4C9A8 0%, #C4B898 100%);">
-        <!-- Top body area -->
-        <div class="px-6 pt-6 pb-4">
+      <div class="rounded-[24px] overflow-hidden shadow-2xl" style="background: linear-gradient(180deg, #D1D1CF 0%, #C0C0BD 100%);">
+        <!-- Top area -->
+        <div class="px-6 pt-6 pb-0">
           <!-- Screen bezel -->
-          <div class="rounded-lg overflow-hidden" style="background: linear-gradient(135deg, #5C4F3E, #3D3224); box-shadow: inset 0 2px 4px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.15);">
-            <div class="m-1.5 bg-[#8BAC0F] rounded-sm p-1">
+          <div class="rounded-[10px] overflow-hidden" style="background: linear-gradient(150deg, #3D3D3D, #2A2A2A); box-shadow: inset 0 2px 6px rgba(0,0,0,.5), 0 1px 0 rgba(255,255,255,.2);">
+            <div class="m-[3px] bg-[#9BBC0F] rounded-[4px] p-1.5">
               <canvas id="tetris-game" class="mx-auto" tabindex="0"></canvas>
             </div>
+          </div>
+          <!-- Screen glare line -->
+          <div class="h-px mx-2 mt-1" style="background: linear-gradient(90deg, transparent, rgba(255,255,255,.12), transparent);"></div>
+          <!-- Brand row -->
+          <div class="flex items-end justify-between px-1 mt-2 pb-2">
+            <div>
+              <span class="text-[9px] tracking-[.2em] font-bold" style="color: #3D3D3D; font-family: Arial, Helvetica, sans-serif;">Nintendo</span>
+              <span class="text-[11px] tracking-[.35em] font-bold ml-1" style="color: #3D3D3D; font-family: Arial, Helvetica, sans-serif;">GAME BOY</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full" style="background: #CC0000; box-shadow: inset 0 1px 1px rgba(0,0,0,.3);"></span>
+              <span class="text-[9px] font-bold" style="color: #CC0000; font-family: Arial, Helvetica, sans-serif;">BATTERY</span>
+            </div>
+          </div>
+        </div>
+        <!-- Bottom body area -->
+        <div class="px-6 pb-6 pt-1" style="background: linear-gradient(180deg, #C0C0BD, #B5B5B2);">
+          <div class="flex items-center justify-between">
+            <!-- Left: D-pad outline -->
+            <div class="w-[72px] h-[72px] rounded-full relative" style="background: radial-gradient(circle at 40% 40%, #B0B0AD, #9A9A97); box-shadow: inset 0 2px 4px rgba(0,0,0,.25), 0 1px 0 rgba(255,255,255,.15);">
+              <!-- Cross shape -->
+              <div class="absolute inset-0 flex items-center justify-center">
+                <div class="w-4 h-10 rounded-sm" style="background: #3D3D3D; box-shadow: inset 0 1px 2px rgba(0,0,0,.4);"></div>
+                <div class="w-10 h-4 rounded-sm absolute" style="background: #3D3D3D; box-shadow: inset 0 1px 2px rgba(0,0,0,.4);"></div>
+              </div>
+            </div>
+            <!-- Center info -->
+            <div class="flex flex-col items-center gap-2">
+              <div class="flex items-center gap-4 text-[10px] font-mono" style="color: #3D3D3D;">
+                <span>SCORE <span id="game-score" class="font-bold">0</span></span>
+                <span>LINES <span id="game-lines" class="font-bold">0</span></span>
+                <span>LV <span id="game-level" class="font-bold">1</span></span>
+              </div>
+              <div class="flex items-center gap-2">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[9px] font-mono" style="color: #3D3D3D;">NEXT</span>
+                  <canvas id="tetris-next" width="52" height="40" class="bg-[#9BBC0F] rounded border border-[#5C6B2C]"></canvas>
+                </div>
+              </div>
+            </div>
+            <!-- Right: A/B buttons -->
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-full relative" style="background: radial-gradient(circle at 40% 40%, #8B008B, #5C005C); box-shadow: inset 0 2px 3px rgba(0,0,0,.3), 0 1px 0 rgba(255,255,255,.1);">
+                <span class="absolute inset-0 flex items-center justify-center text-white text-[11px] font-bold" style="font-family: Arial, sans-serif; text-shadow: 0 1px 1px rgba(0,0,0,.3);">B</span>
+              </div>
+              <div class="w-9 h-9 rounded-full relative" style="background: radial-gradient(circle at 40% 40%, #8B008B, #5C005C); box-shadow: inset 0 2px 3px rgba(0,0,0,.3), 0 1px 0 rgba(255,255,255,.1);">
+                <span class="absolute inset-0 flex items-center justify-center text-white text-[11px] font-bold" style="font-family: Arial, sans-serif; text-shadow: 0 1px 1px rgba(0,0,0,.3);">A</span>
+              </div>
+            </div>
+          </div>
+          <!-- Start / Select + Speaker -->
+          <div class="flex items-end justify-between mt-4">
+            <div class="flex gap-4">
+              <div class="flex items-center gap-1.5">
+                <div class="w-6 h-2 rounded-sm" style="background: #3D3D3D; box-shadow: inset 0 1px 1px rgba(0,0,0,.3);"></div>
+                <span class="text-[8px] font-bold tracking-wider" style="color: #3D3D3D;">SELECT</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <div class="w-6 h-2 rounded-sm" style="background: #3D3D3D; box-shadow: inset 0 1px 1px rgba(0,0,0,.3);"></div>
+                <span class="text-[8px] font-bold tracking-wider" style="color: #3D3D3D;">START</span>
+              </div>
+            </div>
+            <!-- Speaker grills -->
+            <div class="flex items-end gap-1 h-12">
+              <div class="w-[5px] rounded-full" style="background: linear-gradient(180deg, transparent 10%, #3D3D3D 20%, #3D3D3D 80%, transparent 90%); height: 18px;"></div>
+              <div class="w-[5px] rounded-full" style="background: linear-gradient(180deg, transparent 10%, #3D3D3D 20%, #3D3D3D 80%, transparent 90%); height: 28px;"></div>
+              <div class="w-[5px] rounded-full" style="background: linear-gradient(180deg, transparent 10%, #3D3D3D 20%, #3D3D3D 80%, transparent 90%); height: 38px;"></div>
+              <div class="w-[5px] rounded-full" style="background: linear-gradient(180deg, transparent 10%, #3D3D3D 20%, #3D3D3D 80%, transparent 90%); height: 48px;"></div>
+              <div class="w-[5px] rounded-full" style="background: linear-gradient(180deg, transparent 10%, #3D3D3D 20%, #3D3D3D 80%, transparent 90%); height: 38px;"></div>
+              <div class="w-[5px] rounded-full" style="background: linear-gradient(180deg, transparent 10%, #3D3D3D 20%, #3D3D3D 80%, transparent 90%); height: 28px;"></div>
+              <div class="w-[5px] rounded-full" style="background: linear-gradient(180deg, transparent 10%, #3D3D3D 20%, #3D3D3D 80%, transparent 90%); height: 18px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
           </div>
           <!-- Screen reflection accent -->
           <div class="h-px mx-2 mb-1" style="background: linear-gradient(90deg, transparent, rgba(255,255,255,.15), transparent);"></div>
@@ -331,7 +408,7 @@
             <!-- Right: next piece -->
             <div class="flex items-center gap-1.5">
               <span class="text-[10px] font-mono" style="color: #5C4F3E;">NEXT</span>
-              <canvas id="tetris-next" width="60" height="48" class="bg-[#8BAC0F] rounded border border-[#5C6B2C]"></canvas>
+              <canvas id="tetris-next" width="60" height="48" class="bg-[#9BBC0F] rounded border border-[#5C6B2C]"></canvas>
             </div>
           </div>
         </div>
@@ -598,7 +675,7 @@
       }
 
       function draw() {
-        ctx.fillStyle = '#8BAC0F';
+        ctx.fillStyle = '#9BBC0F';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         for (var r = 0; r < ROWS; r++)
           for (var c = 0; c < COLS; c++) {
@@ -630,7 +707,7 @@
 
       function drawNext() {
         if (!previewCtx) return;
-        previewCtx.fillStyle = '#8BAC0F';
+        previewCtx.fillStyle = '#9BBC0F';
         previewCtx.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
         var shape = PIECES[nextType].shape, ps = 16;
         var ox = (previewCanvas.width - shape[0].length * ps) / 2;
