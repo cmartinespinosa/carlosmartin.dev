@@ -79,8 +79,9 @@
   </nav>
 
   <!-- ========== HERO ========== -->
-  <section class="pt-28 pb-16 md:pt-36 md:pb-24 text-center">
-    <div class="max-w-4xl mx-auto px-5">
+  <section class="relative pt-28 pb-16 md:pt-36 md:pb-24 text-center overflow-hidden">
+    <canvas id="tetris-bg" class="absolute inset-0 w-full h-full pointer-events-none" style="opacity: .45;"></canvas>
+    <div class="relative max-w-4xl mx-auto px-5">
       <div class="mb-6">
         <img src="/images/carlos.jpg" alt="Carlos Martin" class="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover mx-auto shadow-lg ring-4 ring-primary-200">
       </div>
@@ -283,6 +284,132 @@
         if (target) target.scrollIntoView({ behavior: 'smooth' });
       });
     });
+
+    // Tetris background animation
+    (function() {
+      var canvas = document.getElementById('tetris-bg');
+      if (!canvas) return;
+      var ctx = canvas.getContext('2d');
+      var layers = [
+        { block: 14, speed: 0.2, alpha: 0.15, interval: [3500, 2500] },
+        { block: 24, speed: 0.45, alpha: 0.25, interval: [2500, 2000] },
+        { block: 38, speed: 0.8, alpha: 0.35, interval: [1800, 1500] },
+      ];
+      var pieces = [
+        // I
+        { shape: [[1,1,1,1]], color: '#00F0F0' },
+        { shape: [[1],[1],[1],[1]], color: '#00F0F0' },
+        // O
+        { shape: [[1,1],[1,1]], color: '#F0F000' },
+        // T
+        { shape: [[1,1,1],[0,1,0]], color: '#A000F0' },
+        { shape: [[0,1],[1,1],[0,1]], color: '#A000F0' },
+        // L
+        { shape: [[1,1,1],[1,0,0]], color: '#F0A000' },
+        { shape: [[1,1],[0,1],[0,1]], color: '#F0A000' },
+        { shape: [[0,0,1],[1,1,1]], color: '#F0A000' },
+        // J
+        { shape: [[1,1,1],[0,0,1]], color: '#0000F0' },
+        { shape: [[0,1],[0,1],[1,1]], color: '#0000F0' },
+        { shape: [[1,0,0],[1,1,1]], color: '#0000F0' },
+        // S
+        { shape: [[1,1,0],[0,1,1]], color: '#00F000' },
+        { shape: [[0,1],[1,1],[1,0]], color: '#00F000' },
+        // Z
+        { shape: [[0,1,1],[1,1,0]], color: '#F00000' },
+        { shape: [[1,0],[1,1],[0,1]], color: '#F00000' },
+      ];
+      var falling = [];
+
+      function resize() {
+        var rect = canvas.parentElement.getBoundingClientRect();
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+      }
+
+      function addPiece(layerIdx) {
+        var l = layers[layerIdx];
+        var p = pieces[Math.floor(Math.random() * pieces.length)];
+        var pw = p.shape[0].length * l.block;
+        var ph = p.shape.length * l.block;
+        var mx, attempts = 0;
+        do {
+          mx = Math.random() * (canvas.width + pw * 2) - pw;
+          attempts++;
+        } while (attempts < 15 && falling.some(function(f) {
+          var fl = layers[f.layer];
+          var fw = f.shape[0].length * fl.block;
+          var fh = f.shape.length * fl.block;
+          return Math.abs(f.x - mx) < (fw + pw) / 2 && f.y < ph + 20;
+        }));
+        falling.push({
+          x: mx,
+          y: -ph * (1 + Math.random()),
+          shape: p.shape,
+          color: p.color,
+          layer: layerIdx
+        });
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (var i = 0; i < falling.length; i++) {
+          var p = falling[i];
+          var l = layers[p.layer];
+          var drawn = false;
+          for (var r = 0; r < p.shape.length; r++) {
+            for (var c = 0; c < p.shape[r].length; c++) {
+              if (p.shape[r][c]) {
+                drawn = true;
+                var x = p.x + c * l.block, y = p.y + r * l.block;
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = l.alpha;
+                ctx.fillRect(x, y, l.block - 1, l.block - 1);
+                ctx.globalAlpha = l.alpha + 0.15;
+                ctx.strokeStyle = p.color;
+                ctx.lineWidth = Math.max(1, l.block / 14);
+                ctx.strokeRect(x, y, l.block - 1, l.block - 1);
+              }
+            }
+          }
+          p.y += l.speed;
+          if (!drawn || p.y > canvas.height + l.block * 2) { falling.splice(i, 1); i--; }
+        }
+        ctx.globalAlpha = 1;
+      }
+
+      var timers = [0, 0, 0];
+      function loop(time) {
+        for (var i = 0; i < 3; i++) {
+          if (time - timers[i] > layers[i].interval[0] + Math.random() * layers[i].interval[1]) {
+            addPiece(i);
+            timers[i] = time;
+          }
+        }
+        draw();
+        requestAnimationFrame(loop);
+      }
+
+      resize();
+      window.addEventListener('resize', resize);
+      // Spawn initial pieces already visible mid-canvas
+      for (var i = 0; i < 3; i++) {
+        var l = layers[i];
+        for (var j = 0; j < 4; j++) {
+          var p = pieces[Math.floor(Math.random() * pieces.length)];
+          var pw = p.shape[0].length * l.block;
+          var ph = p.shape.length * l.block;
+          falling.push({
+            x: Math.random() * (canvas.width + pw * 2) - pw,
+            y: Math.random() * canvas.height * 0.8,
+            shape: p.shape,
+            color: p.color,
+            layer: i
+          });
+        }
+      }
+      requestAnimationFrame(loop);
+    })();
   </script>
 </body>
 </html>
