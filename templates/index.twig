@@ -698,6 +698,44 @@
         }
       });
 
+      canvas.addEventListener('touchstart', function(e) {
+        if (gameOver) return;
+        e.preventDefault();
+        var t = e.touches[0];
+        canvas._tx = t.clientX;
+        canvas._ty = t.clientY;
+        canvas._tTime = Date.now();
+      }, { passive: false });
+
+      canvas.addEventListener('touchmove', function(e) {
+        if (gameOver) return;
+        e.preventDefault();
+        var t = e.touches[0];
+        var dx = t.clientX - canvas._tx;
+        var dy = t.clientY - canvas._ty;
+        if (Math.abs(dx) > 30) {
+          if (dx > 0) { moveRight(); } else { moveLeft(); }
+          canvas._tx = t.clientX;
+          canvas._ty = t.clientY;
+        }
+        if (dy > 30) {
+          moveDown();
+          canvas._tx = t.clientX;
+          canvas._ty = t.clientY;
+        }
+      }, { passive: false });
+
+      canvas.addEventListener('touchend', function(e) {
+        if (gameOver) return;
+        e.preventDefault();
+        var dx = Math.abs(e.changedTouches[0].clientX - canvas._tx);
+        var dy = Math.abs(e.changedTouches[0].clientY - canvas._ty);
+        var dt = Date.now() - canvas._tTime;
+        if (dx < 10 && dy < 10 && dt < 200) {
+          rotatePiece();
+        }
+      });
+
       // === TETRIS MUSIC ===
       (function() {
         var audio = null, isMuted = true;
