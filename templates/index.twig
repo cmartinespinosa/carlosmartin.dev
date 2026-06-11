@@ -287,126 +287,22 @@
 
   <!-- TETRIS GAME OVERLAY -->
   <div id="tetris-overlay" class="fixed inset-0 z-[100] flex items-center justify-center hidden bg-black/60 gameboy-overlay">
-    <div class="relative select-none" style="width: 330px;">
+    <div class="relative select-none">
       <button onclick="closeTetris()" class="absolute -top-8 right-0 text-white/50 hover:text-white text-sm transition z-10">
-        <i class="fa-solid fa-xmark"></i> Close
+        <i class="fa-solid fa-xmark"></i>
       </button>
-      <div class="rounded-[20px] overflow-hidden shadow-2xl" style="background: linear-gradient(180deg, #D1D1CF 0%, #C0C0BD 100%);">
-        <!-- Screen section -->
-        <div class="px-7 pt-7 pb-3">
-          <!-- Dark bezel -->
-          <div class="rounded-[10px] overflow-hidden" style="background: #3D3D3D; box-shadow: inset 0 3px 8px rgba(0,0,0,.5);">
-            <!-- Inner screen -->
-            <div class="m-[3px] bg-[#9BBC0F] rounded-[3px] p-1" style="box-shadow: inset 0 0 6px rgba(0,0,0,.15);">
-              <canvas id="tetris-game" class="mx-auto" tabindex="0"></canvas>
-            </div>
-          </div>
-        </div>
-        <!-- Brand row -->
-        <div class="px-7 pb-2 flex items-end justify-between">
-          <div>
-            <span class="text-[8px] tracking-[.2em] font-bold" style="color: #3D3D3D; font-family: Arial, sans-serif;">Nintendo</span>
-            <span class="text-[10px] tracking-[.35em] font-bold ml-0.5" style="color: #3D3D3D; font-family: Arial, sans-serif;">GAME BOY</span>
-          </div>
-          <div class="flex items-center gap-1">
-            <span class="w-1.5 h-1.5 rounded-full" style="background: #CC0000; box-shadow: inset 0 1px 1px rgba(0,0,0,.3);"></span>
-            <span class="text-[7px] font-bold" style="color: #CC0000; font-family: Arial, sans-serif;">BATTERY</span>
-          </div>
-        </div>
-        <!-- Body section -->
-        <div class="px-5 pb-5 pt-1" style="background: linear-gradient(180deg, #C0C0BD 0%, #B5B5B2 100%);">
-          <!-- Main controls row -->
-          <div class="flex items-center justify-between">
-            <!-- D-pad -->
-            <div class="w-[66px] h-[66px] rounded-full relative flex items-center justify-center" style="background: radial-gradient(circle at 40% 40%, #B0B0AD, #9A9A97); box-shadow: inset 0 2px 4px rgba(0,0,0,.25), 0 1px 0 rgba(255,255,255,.12);">
-              <div class="w-3.5 h-9 rounded-sm absolute" style="background: #3D3D3D; box-shadow: inset 0 1px 2px rgba(0,0,0,.4);"></div>
-              <div class="w-9 h-3.5 rounded-sm absolute" style="background: #3D3D3D; box-shadow: inset 0 1px 2px rgba(0,0,0,.4);"></div>
-            </div>
-            <!-- Center info -->
-            <div class="flex flex-col items-center gap-1">
-              <div class="flex gap-2.5 text-[9px] font-mono" style="color: #3D3D3D;">
-                <span>SCORE <span id="game-score" class="font-bold">0</span></span>
-                <span>LINES <span id="game-lines" class="font-bold">0</span></span>
-                <span>LV <span id="game-level" class="font-bold">1</span></span>
-              </div>
-              <div class="flex items-center gap-1">
-                <span class="text-[8px] font-mono" style="color: #3D3D3D;">NEXT</span>
-                <canvas id="tetris-next" width="44" height="34" class="bg-[#9BBC0F] rounded border border-[#5C6B2C]"></canvas>
-              </div>
-            </div>
-            <!-- A/B buttons -->
-            <div class="flex items-center gap-2.5">
-              <div class="w-[30px] h-[30px] rounded-full flex items-center justify-center" style="background: radial-gradient(circle at 40% 40%, #8B008B, #5C005C); box-shadow: inset 0 2px 3px rgba(0,0,0,.3), 0 1px 0 rgba(255,255,255,.08);">
-                <span class="text-white text-[9px] font-bold" style="font-family: Arial, sans-serif; text-shadow: 0 1px 1px rgba(0,0,0,.3);">B</span>
-              </div>
-              <div class="w-[30px] h-[30px] rounded-full flex items-center justify-center" style="background: radial-gradient(circle at 40% 40%, #8B008B, #5C005C); box-shadow: inset 0 2px 3px rgba(0,0,0,.3), 0 1px 0 rgba(255,255,255,.08);">
-                <span class="text-white text-[9px] font-bold" style="font-family: Arial, sans-serif; text-shadow: 0 1px 1px rgba(0,0,0,.3);">A</span>
-              </div>
-            </div>
-          </div>
-          <!-- Bottom row: Select/Start + Speaker -->
-          <div class="flex items-end justify-between mt-2">
-            <div class="flex gap-3">
-              <div class="flex items-center gap-1">
-                <div class="w-[18px] h-[5px] rounded-sm" style="background: #3D3D3D; box-shadow: inset 0 1px 1px rgba(0,0,0,.3);"></div>
-                <span class="text-[6px] font-bold tracking-widest" style="color: #3D3D3D; font-family: Arial, sans-serif;">SELECT</span>
-              </div>
-              <div class="flex items-center gap-1">
-                <div class="w-[18px] h-[5px] rounded-sm" style="background: #3D3D3D; box-shadow: inset 0 1px 1px rgba(0,0,0,.3);"></div>
-                <span class="text-[6px] font-bold tracking-widest" style="color: #3D3D3D; font-family: Arial, sans-serif;">START</span>
-              </div>
-            </div>
-            <!-- Speaker grills -->
-            <div class="flex items-end gap-[3px] h-[36px]">
-              <div class="w-[3px] rounded-full" style="background: #3D3D3D; opacity: .25; height: 12px;"></div>
-              <div class="w-[3px] rounded-full" style="background: #3D3D3D; opacity: .25; height: 20px;"></div>
-              <div class="w-[3px] rounded-full" style="background: #3D3D3D; opacity: .25; height: 28px;"></div>
-              <div class="w-[3px] rounded-full" style="background: #3D3D3D; opacity: .25; height: 34px;"></div>
-              <div class="w-[3px] rounded-full" style="background: #3D3D3D; opacity: .25; height: 28px;"></div>
-              <div class="w-[3px] rounded-full" style="background: #3D3D3D; opacity: .25; height: 20px;"></div>
-              <div class="w-[3px] rounded-full" style="background: #3D3D3D; opacity: .25; height: 12px;"></div>
-            </div>
-          </div>
+      <div class="rounded-xl overflow-hidden shadow-2xl" style="background: #1a1a1a;">
+        <div class="m-[3px] bg-[#9BBC0F] rounded-lg overflow-hidden p-1.5" style="box-shadow: inset 0 0 10px rgba(0,0,0,.2);">
+          <canvas id="tetris-game" class="mx-auto" tabindex="0"></canvas>
         </div>
       </div>
-    </div>
-  </div>
-          </div>
-          <!-- Screen reflection accent -->
-          <div class="h-px mx-2 mb-1" style="background: linear-gradient(90deg, transparent, rgba(255,255,255,.15), transparent);"></div>
-          <!-- Brand text -->
-          <div class="flex justify-between items-end px-1 mt-2">
-            <span class="text-[10px] tracking-[.35em] font-bold" style="color: #5C4F3E;">GAME BOY</span>
-            <div class="flex items-center gap-3 text-[11px] font-mono" style="color: #5C4F3E;">
-              <span>SCORE <span id="game-score">0</span></span>
-              <span>LV <span id="game-level">1</span></span>
-            </div>
-          </div>
+      <div class="absolute bottom-4 left-0 right-0 flex justify-between items-end px-3 pointer-events-none">
+        <div class="flex gap-3 text-[10px] font-mono text-[#0f380f] opacity-70">
+          <span><span id="game-score">0</span></span>
+          <span><span id="game-lines">0</span>L</span>
+          <span>Lv<span id="game-level">1</span></span>
         </div>
-        <!-- Bottom body area -->
-        <div class="px-6 pb-5" style="background: linear-gradient(180deg, #C4B898, #B8AC8C);">
-          <div class="flex items-center justify-between pt-2">
-            <!-- Left: lines -->
-            <div class="text-[10px] font-mono" style="color: #5C4F3E;">
-              LINES <span id="game-lines">0</span>
-            </div>
-            <!-- Center: speaker grills -->
-            <div class="flex items-end gap-1.5 h-8">
-              <div class="w-1 rounded-full" style="background: #5C4F3E; height: 10px;"></div>
-              <div class="w-1 rounded-full" style="background: #5C4F3E; height: 16px;"></div>
-              <div class="w-1 rounded-full" style="background: #5C4F3E; height: 22px;"></div>
-              <div class="w-1 rounded-full" style="background: #5C4F3E; height: 28px;"></div>
-              <div class="w-1 rounded-full" style="background: #5C4F3E; height: 22px;"></div>
-              <div class="w-1 rounded-full" style="background: #5C4F3E; height: 16px;"></div>
-              <div class="w-1 rounded-full" style="background: #5C4F3E; height: 10px;"></div>
-            </div>
-            <!-- Right: next piece -->
-            <div class="flex items-center gap-1.5">
-              <span class="text-[10px] font-mono" style="color: #5C4F3E;">NEXT</span>
-              <canvas id="tetris-next" width="60" height="48" class="bg-[#9BBC0F] rounded border border-[#5C6B2C]"></canvas>
-            </div>
-          </div>
-        </div>
+        <canvas id="tetris-next" width="52" height="40" class="opacity-80"></canvas>
       </div>
     </div>
   </div>
@@ -553,7 +449,7 @@
       var ctx = canvas.getContext('2d');
       var previewCanvas = document.getElementById('tetris-next');
       var previewCtx = previewCanvas ? previewCanvas.getContext('2d') : null;
-      var COLS = 10, ROWS = 20, SIZE = 12;
+      var COLS = 10, ROWS = 20, SIZE = 16;
       canvas.width = COLS * SIZE;
       canvas.height = ROWS * SIZE;
 
@@ -694,7 +590,7 @@
           ctx.fillStyle = 'rgba(0,0,0,.65)';
           ctx.fillRect(0, ROWS / 2 * SIZE - 18, COLS * SIZE, 36);
           ctx.fillStyle = '#fff';
-          ctx.font = 'bold 11px monospace';
+          ctx.font = 'bold 13px monospace';
           ctx.textAlign = 'center';
           ctx.fillText('GAME OVER', COLS * SIZE / 2, ROWS / 2 * SIZE + 5);
         }
@@ -702,8 +598,7 @@
 
       function drawNext() {
         if (!previewCtx) return;
-        previewCtx.fillStyle = '#9BBC0F';
-        previewCtx.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
+        previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
         var shape = PIECES[nextType].shape, ps = 10;
         var ox = (previewCanvas.width - shape[0].length * ps) / 2;
         var oy = (previewCanvas.height - shape.length * ps) / 2;
