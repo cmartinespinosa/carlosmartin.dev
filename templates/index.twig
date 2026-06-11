@@ -558,7 +558,7 @@
         draw();
       }
 
-      function moveLeft() { if (!gameOver && valid(currentPiece, currentX - 1, currentY)) currentX++; draw(); }
+      function moveLeft() { if (!gameOver && valid(currentPiece, currentX - 1, currentY)) currentX--; draw(); }
       function moveRight() { if (!gameOver && valid(currentPiece, currentX + 1, currentY)) currentX++; draw(); }
       function moveDown() { if (!gameOver && valid(currentPiece, currentX, currentY + 1)) currentY++; draw(); }
       function rotatePiece() {
