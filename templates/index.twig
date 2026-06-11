@@ -61,7 +61,8 @@
   </script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; overflow-x: hidden; }
+    body { overflow-x: hidden; }
     .skill-card { transition: all .3s ease; }
     .skill-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,.1); }
     .timeline-line { position: absolute; left: 50%; transform: translateX(-50%); top: 0; bottom: 0; width: 2px; background: #FED7AA; }
@@ -254,7 +255,7 @@
               </div>
             </div>
             <div class="absolute left-[11px] md:left-1/2 md:-translate-x-1/2 top-1 w-4 h-4 rounded-full bg-primary-500 border-4 border-primary-100 z-10"></div>
-            <div class="relative w-full md:w-[calc(50%-2rem)] bg-white rounded-xl p-6 shadow-md border border-gray-100 md:ml-0 ml-8">
+            <div class="relative w-[calc(100%-2rem)] md:w-[calc(50%-2rem)] bg-white rounded-xl p-6 shadow-md border border-gray-100 md:ml-0 ml-8">
               <div class="md:hidden mb-3">
                 <span class="inline-block bg-primary-100 text-primary-700 text-xs font-semibold px-3 py-1 rounded-full">{{ job.period }}</span>
               </div>
