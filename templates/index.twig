@@ -577,6 +577,20 @@
         } catch(e) {}
       }
 
+      function playMoveSound() {
+        try {
+          var ctx = getAudioCtx();
+          var osc = ctx.createOscillator();
+          var gain = ctx.createGain();
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(200, ctx.currentTime);
+          gain.gain.setValueAtTime(0.08, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.04);
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.04);
+        } catch(e) {}
+      }
+
       function lock() {
         for (var r = 0; r < currentPiece.length; r++)
           for (var c = 0; c < currentPiece[r].length; c++)
@@ -634,13 +648,13 @@
         draw();
       }
 
-      function moveLeft() { if (!gameOver && valid(currentPiece, currentX - 1, currentY)) currentX--; draw(); }
-      function moveRight() { if (!gameOver && valid(currentPiece, currentX + 1, currentY)) currentX++; draw(); }
-      function moveDown() { if (!gameOver && valid(currentPiece, currentX, currentY + 1)) currentY++; draw(); }
+      function moveLeft() { if (!gameOver && valid(currentPiece, currentX - 1, currentY)) { currentX--; playMoveSound(); } draw(); }
+      function moveRight() { if (!gameOver && valid(currentPiece, currentX + 1, currentY)) { currentX++; playMoveSound(); } draw(); }
+      function moveDown() { if (!gameOver && valid(currentPiece, currentX, currentY + 1)) { currentY++; playMoveSound(); } draw(); }
       function rotatePiece() {
         if (gameOver) return;
         var r = rotate(currentPiece);
-        if (valid(r, currentX, currentY)) currentPiece = r;
+        if (valid(r, currentX, currentY)) { currentPiece = r; playMoveSound(); }
         draw();
       }
       function hardDrop() {
