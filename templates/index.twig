@@ -541,22 +541,39 @@
         return true;
       }
 
-      var sfx = {};
+      var sfxBuffers = {}, audioCtx = null;
+      function getAudioCtx() {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        return audioCtx;
+      }
+      function loadSfx(name, url) {
+        fetch(url).then(function(r) { return r.arrayBuffer(); }).then(function(buf) {
+          return getAudioCtx().decodeAudioData(buf);
+        }).then(function(d) { sfxBuffers[name] = d; }).catch(function() {});
+      }
       function playSfx(name) {
         try {
-          if (!sfx[name]) {
-            sfx[name] = new Audio('/audio/' + name);
-            sfx[name].volume = 0.6;
-          }
-          sfx[name].currentTime = 0;
-          sfx[name].play();
+          var buf = sfxBuffers[name];
+          if (!buf) return;
+          var ctx = getAudioCtx(), src = ctx.createBufferSource(), gain = ctx.createGain();
+          src.buffer = buf;
+          gain.gain.value = 0.6;
+          src.connect(gain); gain.connect(ctx.destination);
+          src.start(0);
         } catch(e) {}
       }
+      loadSfx('move', '/audio/tetris-move.wav');
+      loadSfx('rotate', '/audio/tetris-rotate.wav');
+      loadSfx('land', '/audio/tetris-land.wav');
+      loadSfx('lineClear', '/audio/tetris-line-clear.wav');
+      loadSfx('4lines', '/audio/tetris-4lines.wav');
+      loadSfx('gameover', '/audio/tetris-gameover.wav');
       function playClearSound(cleared) {
-        playSfx(cleared >= 4 ? 'tetris-4lines.wav' : 'tetris-line-clear.wav');
+        playSfx(cleared >= 4 ? '4lines' : 'lineClear');
       }
       function playGameOverSound() {
-        playSfx('tetris-gameover.wav');
+        playSfx('gameover');
       }
 
       function lock() {
@@ -567,7 +584,7 @@
               if (ny < 0) { gameOver = true; playGameOverSound(); return; }
               grid[ny][nx] = currentType + 1;
             }
-        playSfx('tetris-land.wav');
+        playSfx('land');
         clearLines();
         spawn();
       }
@@ -616,13 +633,13 @@
         draw();
       }
 
-      function moveLeft() { if (!gameOver && valid(currentPiece, currentX - 1, currentY)) { currentX--; playSfx('tetris-move.wav'); } draw(); }
-      function moveRight() { if (!gameOver && valid(currentPiece, currentX + 1, currentY)) { currentX++; playSfx('tetris-move.wav'); } draw(); }
-      function moveDown() { if (!gameOver && valid(currentPiece, currentX, currentY + 1)) { currentY++; playSfx('tetris-move.wav'); } draw(); }
+      function moveLeft() { if (!gameOver && valid(currentPiece, currentX - 1, currentY)) { currentX--; playSfx('move'); } draw(); }
+      function moveRight() { if (!gameOver && valid(currentPiece, currentX + 1, currentY)) { currentX++; playSfx('move'); } draw(); }
+      function moveDown() { if (!gameOver && valid(currentPiece, currentX, currentY + 1)) { currentY++; playSfx('move'); } draw(); }
       function rotatePiece() {
         if (gameOver) return;
         var r = rotate(currentPiece);
-        if (valid(r, currentX, currentY)) { currentPiece = r; playSfx('tetris-rotate.wav'); }
+        if (valid(r, currentX, currentY)) { currentPiece = r; playSfx('rotate'); }
         draw();
       }
       function hardDrop() {
@@ -682,6 +699,7 @@
       }
 
       window.startGame = function() {
+        getAudioCtx();
         createGrid();
         score = 0; lines = 0; level = 1; gameOver = false;
         nextType = Math.floor(Math.random() * PIECES.length);
@@ -693,6 +711,7 @@
       };
 
       window.openTetris = function() {
+        getAudioCtx();
         document.getElementById('tetris-overlay').classList.remove('hidden');
         document.body.style.overflow = 'hidden';
         canvas.focus();
@@ -787,7 +806,6 @@
         window.closeTetris = function() {
           if (origClose) origClose();
           if (audio) { audio.pause(); audio.currentTime = 0; }
-          for (var k in sfx) { if (sfx[k]) { sfx[k].pause(); sfx[k].currentTime = 0; } }
           isMuted = true;
           var btn = document.getElementById('music-btn');
           if (btn) btn.innerHTML = '<i class="fa-solid fa-volume-xmark"></i> Music';
