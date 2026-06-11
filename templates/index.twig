@@ -286,23 +286,31 @@
   </footer>
 
   <!-- TETRIS GAME OVERLAY -->
-  <div id="tetris-overlay" class="fixed inset-0 z-[100] flex items-center justify-center hidden bg-black/60 gameboy-overlay">
-    <div class="relative select-none">
-      <button onclick="closeTetris()" class="absolute -top-8 right-0 text-white/50 hover:text-white text-sm transition z-10">
+  <div id="tetris-overlay" class="fixed inset-0 z-[100] flex items-center justify-center hidden bg-black/50 gameboy-overlay">
+    <div class="gameboy-shell shadow-2xl p-6 pt-8 relative" style="width: 340px;">
+      <button onclick="closeTetris()" class="absolute top-2 right-3 text-[#8B7E6A] hover:text-[#5C4F3E] text-lg transition z-10">
         <i class="fa-solid fa-xmark"></i>
       </button>
-      <div class="rounded-xl overflow-hidden shadow-2xl" style="background: #1a1a1a;">
-        <div class="m-[3px] bg-[#9BBC0F] rounded-lg overflow-hidden p-1.5" style="box-shadow: inset 0 0 10px rgba(0,0,0,.2);">
-          <canvas id="tetris-game" class="mx-auto" tabindex="0"></canvas>
+      <div class="text-center font-bold text-sm tracking-[.3em] text-[#5C4F3E] mb-3 select-none">TETRIS</div>
+      <div class="bg-[#8BAC0F] rounded-md p-2 border-2 border-[#5C6B2C] mb-4">
+        <canvas id="tetris-game" class="mx-auto" tabindex="0"></canvas>
+      </div>
+      <div class="flex justify-between items-center mb-4">
+        <div class="flex gap-4 text-xs font-mono text-[#5C4F3E]">
+          <div>Score <span id="game-score" class="font-bold">0</span></div>
+          <div>Lines <span id="game-lines" class="font-bold">0</span></div>
+          <div>Lvl <span id="game-level" class="font-bold">1</span></div>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-mono text-[#5C4F3E]">Next</span>
+          <canvas id="tetris-next" width="72" height="56" class="bg-[#8BAC0F] rounded border border-[#5C6B2C]"></canvas>
         </div>
       </div>
-      <div class="absolute bottom-4 left-0 right-0 flex justify-between items-end px-3 pointer-events-none">
-        <div class="flex gap-3 text-[10px] font-mono text-[#0f380f] opacity-70">
-          <span><span id="game-score">0</span></span>
-          <span><span id="game-lines">0</span>L</span>
-          <span>Lv<span id="game-level">1</span></span>
-        </div>
-        <canvas id="tetris-next" width="52" height="40" class="opacity-80"></canvas>
+      <div class="text-center text-[10px] text-[#8B7E6A] font-mono mb-3 select-none">← → ↓ rotate↑ space↘</div>
+      <div class="flex gap-2">
+        <button onclick="startGame()" class="flex-1 py-2.5 bg-[#5C4F3E] hover:bg-[#3D3224] text-[#D4C9A8] rounded-lg text-sm font-bold tracking-wider transition">
+          START
+        </button>
       </div>
     </div>
   </div>
@@ -449,7 +457,7 @@
       var ctx = canvas.getContext('2d');
       var previewCanvas = document.getElementById('tetris-next');
       var previewCtx = previewCanvas ? previewCanvas.getContext('2d') : null;
-      var COLS = 10, ROWS = 20, SIZE = 16;
+      var COLS = 10, ROWS = 20, SIZE = 20;
       canvas.width = COLS * SIZE;
       canvas.height = ROWS * SIZE;
 
@@ -566,7 +574,7 @@
       }
 
       function draw() {
-        ctx.fillStyle = '#9BBC0F';
+        ctx.fillStyle = '#8BAC0F';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         for (var r = 0; r < ROWS; r++)
           for (var c = 0; c < COLS; c++) {
@@ -590,7 +598,7 @@
           ctx.fillStyle = 'rgba(0,0,0,.65)';
           ctx.fillRect(0, ROWS / 2 * SIZE - 18, COLS * SIZE, 36);
           ctx.fillStyle = '#fff';
-          ctx.font = 'bold 13px monospace';
+          ctx.font = 'bold 14px monospace';
           ctx.textAlign = 'center';
           ctx.fillText('GAME OVER', COLS * SIZE / 2, ROWS / 2 * SIZE + 5);
         }
@@ -598,8 +606,9 @@
 
       function drawNext() {
         if (!previewCtx) return;
-        previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
-        var shape = PIECES[nextType].shape, ps = 10;
+        previewCtx.fillStyle = '#8BAC0F';
+        previewCtx.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
+        var shape = PIECES[nextType].shape, ps = 16;
         var ox = (previewCanvas.width - shape[0].length * ps) / 2;
         var oy = (previewCanvas.height - shape.length * ps) / 2;
         previewCtx.fillStyle = COLORS[nextType];
@@ -646,7 +655,7 @@
           case 'ArrowRight': e.preventDefault(); moveRight(); break;
           case 'ArrowDown': e.preventDefault(); moveDown(); break;
           case 'ArrowUp': e.preventDefault(); rotatePiece(); break;
-          case ' ': e.preventDefault(); if (gameOver) startGame(); else hardDrop(); break;
+          case ' ': e.preventDefault(); hardDrop(); break;
         }
       });
 
