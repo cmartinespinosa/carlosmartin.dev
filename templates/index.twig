@@ -313,8 +313,8 @@
         </button>
       </div>
       <div class="mt-3 text-center">
-        <button id="music-btn" onclick="toggleMusic()" class="text-xs text-[#8B7E6A] hover:text-[#5C4F3E] transition inline-flex items-center gap-1.5">
-          <i class="fa-solid fa-volume-xmark"></i> <span>Music</span>
+        <button id="music-btn" onclick="toggleMusic()" class="w-full py-2 bg-[#8B7E6A] hover:bg-[#5C4F3E] text-[#D4C9A8] rounded-lg text-xs font-bold tracking-wider transition inline-flex items-center justify-center gap-2">
+          <i class="fa-solid fa-volume-xmark"></i> Music
         </button>
       </div>
     </div>
@@ -678,10 +678,10 @@
           var btn = document.getElementById('music-btn');
           if (isMuted) {
             audio.pause();
-            if (btn) btn.innerHTML = '<i class="fa-solid fa-volume-xmark"></i> <span>Music</span>';
+            if (btn) btn.innerHTML = '<i class="fa-solid fa-volume-xmark"></i> Music';
           } else {
             audio.play();
-            if (btn) btn.innerHTML = '<i class="fa-solid fa-volume-high"></i> <span>Music</span>';
+            if (btn) btn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Music';
           }
         };
 
@@ -691,7 +691,7 @@
           if (audio) { audio.pause(); audio.currentTime = 0; }
           isMuted = true;
           var btn = document.getElementById('music-btn');
-          if (btn) btn.innerHTML = '<i class="fa-solid fa-volume-xmark"></i> <span>Music</span>';
+          if (btn) btn.innerHTML = '<i class="fa-solid fa-volume-xmark"></i> Music';
         };
       })();
 
