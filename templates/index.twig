@@ -648,13 +648,25 @@
         draw();
       }
 
+      var rotateAudio = null;
+      function playRotateSound() {
+        try {
+          if (!rotateAudio) {
+            rotateAudio = new Audio('/audio/tetris-rotate.mp3');
+            rotateAudio.volume = 0.6;
+          }
+          rotateAudio.currentTime = 0;
+          rotateAudio.play();
+        } catch(e) {}
+      }
+
       function moveLeft() { if (!gameOver && valid(currentPiece, currentX - 1, currentY)) { currentX--; playMoveSound(); } draw(); }
       function moveRight() { if (!gameOver && valid(currentPiece, currentX + 1, currentY)) { currentX++; playMoveSound(); } draw(); }
       function moveDown() { if (!gameOver && valid(currentPiece, currentX, currentY + 1)) { currentY++; playMoveSound(); } draw(); }
       function rotatePiece() {
         if (gameOver) return;
         var r = rotate(currentPiece);
-        if (valid(r, currentX, currentY)) { currentPiece = r; playMoveSound(); }
+        if (valid(r, currentX, currentY)) { currentPiece = r; playRotateSound(); }
         draw();
       }
       function hardDrop() {
@@ -819,6 +831,7 @@
         window.closeTetris = function() {
           if (origClose) origClose();
           if (audio) { audio.pause(); audio.currentTime = 0; }
+          if (rotateAudio) { rotateAudio.pause(); rotateAudio.currentTime = 0; }
           isMuted = true;
           var btn = document.getElementById('music-btn');
           if (btn) btn.innerHTML = '<i class="fa-solid fa-volume-xmark"></i> Music';
