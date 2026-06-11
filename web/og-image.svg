@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#F97316"/>
+  <rect x="80" y="80" width="1040" height="470" rx="20" fill="white" opacity=".1"/>
+  <text x="600" y="260" text-anchor="middle" fill="white" font-size="64" font-weight="bold" font-family="Inter,system-ui,sans-serif">Carlos Martin</text>
+  <text x="600" y="340" text-anchor="middle" fill="rgba(255,255,255,.8)" font-size="32" font-family="Inter,system-ui,sans-serif">Full-Stack Developer</text>
+  <text x="600" y="400" text-anchor="middle" fill="rgba(255,255,255,.6)" font-size="20" font-family="Inter,system-ui,sans-serif">carlosmartin.dev</text>
+</svg>

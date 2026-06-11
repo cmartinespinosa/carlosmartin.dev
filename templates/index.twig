@@ -1,14 +1,45 @@
+{% set homepage = craft.entries().section('homepage').one() %}
+{% set metaTitle = 'Carlos Martin | ' ~ (homepage.heroTitle ?? 'Full-Stack Developer') %}
+{% set metaDesc = homepage.heroSubtitle ?? 'Full-stack developer with 15+ years of experience building scalable applications.' %}
+{% set metaImage = 'https://carlosmartin.dev/og-image.svg' %}
+{% set canonicalUrl = siteUrl('/') %}
 <!DOCTYPE html>
 <html lang="en" id="top">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Carlos Martin | Full-Stack Developer</title>
-  <meta name="description" content="Full-stack developer with 15+ years of experience building scalable applications.">
+  <title>{{ metaTitle }}</title>
+  <meta name="description" content="{{ metaDesc }}">
+  <link rel="canonical" href="{{ canonicalUrl }}">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ canonicalUrl }}">
+  <meta property="og:title" content="{{ metaTitle }}">
+  <meta property="og:description" content="{{ metaDesc }}">
+  <meta property="og:image" content="{{ metaImage }}">
+  <meta property="og:site_name" content="Carlos Martin">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ metaTitle }}">
+  <meta name="twitter:description" content="{{ metaDesc }}">
+  <meta name="twitter:image" content="{{ metaImage }}">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23F97316'/><text x='16' y='21' text-anchor='middle' fill='white' font-size='14' font-weight='bold' font-family='Arial,sans-serif'>CM</text></svg>">
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Carlos Martin",
+    "jobTitle": "{{ homepage.heroTitle ?? 'Full-Stack Developer' }}",
+    "url": "{{ canonicalUrl }}",
+    "description": "{{ metaDesc }}",
+    "image": "{{ metaImage }}",
+    "sameAs": [
+      "https://github.com/cmartinespinosa",
+      "https://www.linkedin.com/in/carlosmartin0310/"
+    ]
+  }
+  </script>
   <script>
     tailwind.config = {
       theme: {
@@ -45,7 +76,6 @@
 </head>
 <body class="bg-white text-gray-800 antialiased">
 
-  {% set homepage = craft.entries().section('homepage').one() %}
   {% set skillCards = craft.entries().section('skillCards').orderBy('title asc').all() %}
   {% set experience = craft.entries().section('experience').orderBy('postDate desc').all() %}
   {% set socialLinks = craft.entries().section('socialLinks').all() %}

@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /cp/
+Disallow: /cpresources/
+Disallow: /index.php
+Disallow: /storage/
+Disallow: /vendor/
+
+Sitemap: https://carlosmartin.dev/sitemap.xml
