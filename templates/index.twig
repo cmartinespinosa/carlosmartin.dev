@@ -73,6 +73,10 @@
     .tech-badge:hover { transform: translateY(-3px); }
     .gameboy-overlay { backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
     .gameboy-shell { background: #D4C9A8; border-radius: 20px; }
+    @media (max-width: 767px) {
+      .gameboy-shell { width: calc(100vw - 40px) !important; padding: 16px !important; padding-top: 32px !important; }
+      .gameboy-shell .close-btn { font-size: 28px !important; top: 6px !important; right: 10px !important; }
+    }
     #tetris-game { image-rendering: pixelated; }
     #tetris-game:focus { outline: none; }
     #tetris-next { image-rendering: pixelated; }
@@ -322,7 +326,7 @@
   <!-- TETRIS GAME OVERLAY -->
   <div id="tetris-overlay" class="fixed inset-0 z-[100] flex items-center justify-center hidden bg-black/50 gameboy-overlay">
     <div class="gameboy-shell shadow-2xl p-6 pt-8 relative" style="width: 340px;">
-      <button onclick="closeTetris()" class="absolute top-2 right-3 text-[#8B7E6A] hover:text-[#5C4F3E] text-lg transition z-10">
+      <button onclick="closeTetris()" class="close-btn absolute top-2 right-3 text-[#8B7E6A] hover:text-[#5C4F3E] text-lg transition z-10">
         <i class="fa-solid fa-xmark"></i>
       </button>
       <div class="text-center font-bold text-sm tracking-[.3em] text-[#5C4F3E] mb-3 select-none">TETRIS</div>
