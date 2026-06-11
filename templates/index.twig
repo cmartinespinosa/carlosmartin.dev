@@ -541,54 +541,22 @@
         return true;
       }
 
-      var audioCtx = null;
-      function getAudioCtx() {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        return audioCtx;
-      }
-      function playLandSound() {
+      var sfx = {};
+      function playSfx(name) {
         try {
-          var ctx = getAudioCtx();
-          var osc = ctx.createOscillator();
-          var gain = ctx.createGain();
-          osc.type = 'square';
-          osc.frequency.setValueAtTime(120, ctx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(60, ctx.currentTime + 0.08);
-          gain.gain.setValueAtTime(0.3, ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
-          osc.connect(gain); gain.connect(ctx.destination);
-          osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.1);
+          if (!sfx[name]) {
+            sfx[name] = new Audio('/audio/' + name);
+            sfx[name].volume = 0.6;
+          }
+          sfx[name].currentTime = 0;
+          sfx[name].play();
         } catch(e) {}
       }
-      function playClearSound() {
-        try {
-          var ctx = getAudioCtx();
-          var notes = [523, 659, 784];
-          notes.forEach(function(freq, i) {
-            var osc = ctx.createOscillator();
-            var gain = ctx.createGain();
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.08);
-            gain.gain.setValueAtTime(0.2, ctx.currentTime + i * 0.08);
-            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.08 + 0.12);
-            osc.connect(gain); gain.connect(ctx.destination);
-            osc.start(ctx.currentTime + i * 0.08); osc.stop(ctx.currentTime + i * 0.08 + 0.12);
-          });
-        } catch(e) {}
+      function playClearSound(cleared) {
+        playSfx(cleared >= 4 ? 'tetris-4lines.wav' : 'tetris-line-clear.wav');
       }
-
-      function playMoveSound() {
-        try {
-          var ctx = getAudioCtx();
-          var osc = ctx.createOscillator();
-          var gain = ctx.createGain();
-          osc.type = 'square';
-          osc.frequency.setValueAtTime(200, ctx.currentTime);
-          gain.gain.setValueAtTime(0.08, ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.04);
-          osc.connect(gain); gain.connect(ctx.destination);
-          osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.04);
-        } catch(e) {}
+      function playGameOverSound() {
+        playSfx('tetris-gameover.wav');
       }
 
       function lock() {
@@ -596,10 +564,10 @@
           for (var c = 0; c < currentPiece[r].length; c++)
             if (currentPiece[r][c]) {
               var ny = currentY + r, nx = currentX + c;
-              if (ny < 0) { gameOver = true; return; }
+              if (ny < 0) { gameOver = true; playGameOverSound(); return; }
               grid[ny][nx] = currentType + 1;
             }
-        playLandSound();
+        playSfx('tetris-land.wav');
         clearLines();
         spawn();
       }
@@ -616,7 +584,7 @@
           }
         }
         if (cleared) {
-          playClearSound();
+          playClearSound(cleared);
           var pts = [0, 100, 300, 500, 800];
           score += (pts[cleared] || 800) * level;
           lines += cleared;
@@ -636,7 +604,7 @@
         currentPiece = PIECES[currentType].shape;
         currentX = Math.floor((COLS - currentPiece[0].length) / 2);
         currentY = -1;
-        if (!valid(currentPiece, currentX, currentY)) gameOver = true;
+        if (!valid(currentPiece, currentX, currentY)) { gameOver = true; playGameOverSound(); }
         drawNext();
       }
 
@@ -648,25 +616,13 @@
         draw();
       }
 
-      var rotateAudio = null;
-      function playRotateSound() {
-        try {
-          if (!rotateAudio) {
-            rotateAudio = new Audio('/audio/tetris-rotate.mp3');
-            rotateAudio.volume = 0.6;
-          }
-          rotateAudio.currentTime = 0;
-          rotateAudio.play();
-        } catch(e) {}
-      }
-
-      function moveLeft() { if (!gameOver && valid(currentPiece, currentX - 1, currentY)) { currentX--; playMoveSound(); } draw(); }
-      function moveRight() { if (!gameOver && valid(currentPiece, currentX + 1, currentY)) { currentX++; playMoveSound(); } draw(); }
-      function moveDown() { if (!gameOver && valid(currentPiece, currentX, currentY + 1)) { currentY++; playMoveSound(); } draw(); }
+      function moveLeft() { if (!gameOver && valid(currentPiece, currentX - 1, currentY)) { currentX--; playSfx('tetris-move.wav'); } draw(); }
+      function moveRight() { if (!gameOver && valid(currentPiece, currentX + 1, currentY)) { currentX++; playSfx('tetris-move.wav'); } draw(); }
+      function moveDown() { if (!gameOver && valid(currentPiece, currentX, currentY + 1)) { currentY++; playSfx('tetris-move.wav'); } draw(); }
       function rotatePiece() {
         if (gameOver) return;
         var r = rotate(currentPiece);
-        if (valid(r, currentX, currentY)) { currentPiece = r; playRotateSound(); }
+        if (valid(r, currentX, currentY)) { currentPiece = r; playSfx('tetris-rotate.wav'); }
         draw();
       }
       function hardDrop() {
@@ -831,7 +787,7 @@
         window.closeTetris = function() {
           if (origClose) origClose();
           if (audio) { audio.pause(); audio.currentTime = 0; }
-          if (rotateAudio) { rotateAudio.pause(); rotateAudio.currentTime = 0; }
+          for (var k in sfx) { if (sfx[k]) { sfx[k].pause(); sfx[k].currentTime = 0; } }
           isMuted = true;
           var btn = document.getElementById('music-btn');
           if (btn) btn.innerHTML = '<i class="fa-solid fa-volume-xmark"></i> Music';
